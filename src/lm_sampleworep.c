@@ -102,6 +102,7 @@ void GetNextModel_swop(NODEPTR branch, struct Var *vars,
 	for (int i = 0; i< n; i++) {
 		pigamma[i] = 1.0;
 		int bit =  withprob(branch->prob);
+		// Rprintf("bit = %d, pigamma = %.20f\n", bit, pigamma[0]);
 
 		model[vars[i].index] = bit;
 		INTEGER(modeldim)[m]  += bit;
@@ -129,6 +130,11 @@ void GetNextModel_swop(NODEPTR branch, struct Var *vars,
 			if (i == n-1 && branch->zero == NULL) branch->zero = make_node(0.0);
 			branch = branch->zero;
 		}
+	}
+	// Rprintf("after pigamma = %.20f\n", pigamma[0]);
+	if (pigamma[0] < 1.0 && fabs(1.0 - pigamma[0]) < DOUBLE_EPSILON) {
+	  // Rprintf("pigamma set to 1\n");
+	  pigamma[0] = 1.0;
 	}
 }
 
@@ -315,6 +321,7 @@ extern SEXP sampleworep_new(SEXP Y, SEXP X, SEXP Rweights, SEXP Rprobinit,
 	  }
 	  Rprintf("\n");
 	}  */
+	// Rprintf("k = %d\n", k);
 
 	// Sample models
 	for (m = 1;  m < k && pigamma[0] < 1.0; m++) {
@@ -379,6 +386,7 @@ extern SEXP sampleworep_new(SEXP Y, SEXP X, SEXP Rweights, SEXP Rprobinit,
 				}
 			}
 		}
+		// Rprintf("ANS_names %d \n", LENGTH(ANS_names));
 	}
 
   if (m < k) {  // resize
