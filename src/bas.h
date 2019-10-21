@@ -21,7 +21,6 @@
 #define TRUE 1
 #define FALSE 0
 #define Bit unsigned char
-#define DOUBLE_EPSILON 2.2204460492503130808e-16 // print(.Machine$double.eps, 20)
 
 /* Structs. */
 struct Var {
