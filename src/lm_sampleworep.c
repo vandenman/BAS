@@ -102,7 +102,6 @@ void GetNextModel_swop(NODEPTR branch, struct Var *vars,
 	for (int i = 0; i< n; i++) {
 		pigamma[i] = 1.0;
 		int bit =  withprob(branch->prob);
-		// Rprintf("bit = %d, pigamma = %.20f\n", bit, pigamma[0]);
 
 		model[vars[i].index] = bit;
 		INTEGER(modeldim)[m]  += bit;
@@ -131,11 +130,6 @@ void GetNextModel_swop(NODEPTR branch, struct Var *vars,
 			branch = branch->zero;
 		}
 	}
-	// Rprintf("after pigamma = %.20f\n", pigamma[0]);
-	//if (pigamma[0] < 1.0 && fabs(1.0 - pigamma[0]) < DOUBLE_EPSILON) {
-	//  Rprintf("pigamma set to 1\n");
-	//  pigamma[0] = 1.0;
-	//}
 }
 
 double got_parents(int *model, SEXP Rparents, int level, struct Var *var, int nsure)
@@ -194,13 +188,10 @@ double got_parents(int *model, SEXP Rparents, int level, struct Var *var, int ns
 return(prob);
 }
 
-int lessThanOne(double a)
+inline int lessThanOne(double a)
 {
-  // DBL_EPSILON is too restrictive.
+  // DBL_EPSILON is too restrictive. This might need further tweaking
   double LOCAL_DBL_EPSILON = 1E-10;
-  //if (!((1.0 - a) >= LOCAL_DBL_EPSILON) && ((a <= 1.0)))
-  //    Rprintf("lessThanOne triggered!, a = %.20f\n", a);
-
   return (1.0 - a) >= (LOCAL_DBL_EPSILON);
 }
 
@@ -331,11 +322,10 @@ extern SEXP sampleworep_new(SEXP Y, SEXP X, SEXP Rweights, SEXP Rprobinit,
 	  }
 	  Rprintf("\n");
 	}  */
-	// Rprintf("k = %d\n", k);
 
 	// Sample models
-  for (m = 1;  m < k && lessThanOne(pigamma[0]); m++) {
-	  //Rprintf("model %d, starting pigamma = %.20f\n", m, pigamma[0]);
+	for (m = 1;  m < k && lessThanOne(pigamma[0]); m++) {
+	//  Rprintf("model %d, starting pigamma = %lf\n", m, pigamma[0]);
 	  INTEGER(modeldim)[m] = 0;
 		for (i = n; i < p; i++)  {
 			INTEGER(modeldim)[m]  +=  model[vars[i].index];
@@ -396,7 +386,6 @@ extern SEXP sampleworep_new(SEXP Y, SEXP X, SEXP Rweights, SEXP Rprobinit,
 				}
 			}
 		}
-		// Rprintf("ANS_names %d \n", LENGTH(ANS_names));
 	}
 
   if (m < k) {  // resize
